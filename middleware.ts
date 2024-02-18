@@ -1,7 +1,3 @@
-import { withAuth } from "next-auth/middleware";
+export { default } from "next-auth/middleware";
 
-export default withAuth;
-
-export const config = {
-	mathcer: ["/chat", "/chat/:id*", "/register"],
-};
+export const config = { matcher: ["/chat", "/chat/:id*", "/register"] };
