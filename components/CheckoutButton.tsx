@@ -1,7 +1,7 @@
 "use client";
 
 import { db } from "@/firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, onSnapshot } from "firebase/firestore";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
 
@@ -15,12 +15,30 @@ function CheckoutButton() {
 		// push a document into firestore db
 		setLoading(true);
 		const docRef = await addDoc(collection(db, "customers", session.user.id, "checkout_sessions"), {
-			price: "price_1O0998KDjTc6FlwiIL3eBoYQ",
+			price: "price_1Opsh9DC68sqc8v3IHmZtSiP",
 			success_url: window.location.origin,
 			cancel_url: window.location.origin,
 		});
 		//... stripe extesion on firebase will create a checkout session
-		// redirect user to checkout page
+		return onSnapshot(docRef, (snap) => {
+			const data = snap.data();
+			const url = data?.url;
+			const error = data?.error;
+
+			if (error) {
+				// Show an error to your customer and
+				// inspect your Cloud Function logs in the Firebase console.
+				alert(`An error occured: ${error.message}`);
+				setLoading(false);
+			}
+
+			// redirect user to checkout page
+			if (url) {
+				// We have a Stripe Checkout URL, let's redirect.
+				window.location.assign(url);
+				setLoading(false);
+			}
+		});
 	};
 
 	return (
@@ -33,7 +51,7 @@ function CheckoutButton() {
 	 		focus-visible:outline-offset-2 focus-visible:outline-indigo-600 cursor-pointer 
 	 		disabled:opacity-80 disabled:bg-indigo-600/50 disabled:text-white disabled:cursor-default"
 			>
-				Sign Up
+				{loading ? "loading..." : "Sign Up"}
 			</button>
 		</div>
 	);
