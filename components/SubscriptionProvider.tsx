@@ -1,12 +1,30 @@
 "use client";
 
+import { subscriptionRef } from "@/lib/converters/Subscription";
+import { onSnapshot } from "firebase/firestore";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 
 function SubscriptionProvider() {
 	const { data: session } = useSession();
 
-	useEffect(() => {}, []);
+	useEffect(() => {
+		if (!session) {
+			return;
+		}
+		return onSnapshot(subscriptionRef(session?.user.id), (snaphot) => {
+			if (snaphot.empty) {
+				console.log("User has NO subscription");
+
+				//set No Subscription
+				return;
+			} else {
+				console.log("User has subscription");
+
+				//set subscription
+			}
+		});
+	}, [session]);
 
 	return <div>SubscriptionProvider</div>;
 }
