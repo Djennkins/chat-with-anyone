@@ -2,7 +2,6 @@
 
 import { subscriptionRef } from "@/lib/converters/Subscription";
 import { useSubscriptionStore } from "@/store/store";
-import { error } from "console";
 import { onSnapshot } from "firebase/firestore";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
@@ -26,7 +25,10 @@ function SubscriptionProvider({ children }: { children: React.ReactNode }) {
 				} else {
 					console.log("User has subscription");
 					//set subscription
-					setSubscription(snaphot.docs[0].data());
+					//original code looked like:
+					//setSubscription(snaphot.docs[0].data());
+					//My code:
+					setSubscription(snaphot.docs[snaphot.docs.length - 1].data());
 				}
 			},
 			(error) => {
